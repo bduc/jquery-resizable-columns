@@ -1,4 +1,4 @@
-/* jQuery Resizable Columns v0.1.0 | http://dobtco.github.io/jquery-resizable-columns/ | Licensed MIT | Built Wed Apr 30 2014 14:24:25 */
+/* jQuery Resizable Columns v0.1.0 | http://dobtco.github.io/jquery-resizable-columns/ | Licensed MIT | Built Tue Oct 14 2014 17:27:29 */
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __slice = [].slice;
 
@@ -32,9 +32,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.constrainWidth = __bind(this.constrainWidth, this);
       this.options = $.extend({}, this.defaults, options);
       this.$table = $table;
-      this.setHeaders();
-      this.restoreColumnWidths();
-      this.syncHandleWidths();
+      console.log('constructor');
+      this.sync();
       $(window).on('resize.rc', ((function(_this) {
         return function() {
           return _this.syncHandleWidths();
@@ -49,7 +48,19 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       if (this.options.stop) {
         this.$table.bind('column:resize:stop.rc', this.options.stop);
       }
+      this.$table.on('column:resize:sync', (function(_this) {
+        return function(e) {
+          return _this.sync();
+        };
+      })(this));
     }
+
+    ResizableColumns.prototype.sync = function(e) {
+      console.log('sync');
+      this.setHeaders();
+      this.restoreColumnWidths();
+      return this.syncHandleWidths();
+    };
 
     ResizableColumns.prototype.triggerEvent = function(type, args, original) {
       var event;
@@ -105,7 +116,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     ResizableColumns.prototype.syncHandleWidths = function() {
-      return this.$handleContainer.width(this.$table.width()).find('.rc-handle').each((function(_this) {
+      return this.$handleContainer.width(this.$table.width()).offset(this.$table.offset()).find('.rc-handle').each((function(_this) {
         return function(_, el) {
           var $el;
           $el = $(el);

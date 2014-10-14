@@ -29,9 +29,7 @@
       @options = $.extend({}, @defaults, options)
       @$table = $table
 
-      @setHeaders()
-      @restoreColumnWidths()
-      @syncHandleWidths()
+      @sync()
 
       $(window).on 'resize.rc', ( => @syncHandleWidths() )
 
@@ -42,6 +40,13 @@
         @$table.bind('column:resize.rc', @options.resize)
       if @options.stop
         @$table.bind('column:resize:stop.rc', @options.stop)
+        
+      @$table.on 'column:resize:sync', (e) => @sync() 
+   
+    sync: (e) ->
+      @setHeaders()
+      @restoreColumnWidths()
+      @syncHandleWidths()
 
     triggerEvent: (type, args, original) ->
       event = $.Event type
@@ -81,7 +86,7 @@
       @$handleContainer.on 'mousedown touchstart', '.rc-handle', @pointerdown
 
     syncHandleWidths: ->
-      @$handleContainer.width(@$table.width()).find('.rc-handle').each (_, el) =>
+      @$handleContainer.width(@$table.width()).offset(@$table.offset()).find('.rc-handle').each (_, el) =>
         $el = $(el)
         $el.css
           left: $el.data('th').outerWidth() + ($el.data('th').offset().left - @$handleContainer.offset().left)
